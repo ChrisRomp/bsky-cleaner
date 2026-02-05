@@ -205,30 +205,58 @@ export async function fetchLikes(
 ): Promise<{ likes: LikeItem[]; cursor?: string }> {
   const agent = getAgent();
   
-  const response = await agent.getActorLikes({
-    actor: did,
+  // Use listRecords to get actual like records with their URIs
+  const likesResponse = await agent.com.atproto.repo.listRecords({
+    repo: did,
+    collection: 'app.bsky.feed.like',
     limit: 50,
     cursor,
   });
   
-  const likes: LikeItem[] = response.data.feed
-    .filter(item => item.post) // Filter out deleted posts
-    .map(item => {
-    const post = item.post;
-    
-    return {
-      uri: `at://${did}/app.bsky.feed.like/${post.cid}`,
-      cid: post.cid,
-      type: 'like' as const,
-      likedUri: post.uri,
-      likedPost: post,
-      createdAt: new Date(post.indexedAt),
-    };
-  });
+  // Build a map of liked post URIs to like record info
+  const likeRecords = likesResponse.data.records;
+  const likedPostUris = likeRecords
+    .map(record => (record.value as { subject?: { uri?: string } })?.subject?.uri)
+    .filter((uri): uri is string => !!uri);
+  
+  // Fetch the actual posts to get their content (getPosts max 25 at a time)
+  const postsMap = new Map<string, AppBskyFeedDefs.PostView>();
+  
+  // Batch fetch posts in chunks of 25
+  for (let i = 0; i < likedPostUris.length; i += 25) {
+    const batch = likedPostUris.slice(i, i + 25);
+    try {
+      const postsResponse = await agent.getPosts({ uris: batch });
+      for (const post of postsResponse.data.posts) {
+        postsMap.set(post.uri, post);
+      }
+    } catch {
+      // Some posts may have been deleted, that's ok
+    }
+  }
+  
+  const likes: LikeItem[] = likeRecords
+    .map(record => {
+      const likeValue = record.value as { subject?: { uri?: string }; createdAt?: string };
+      const likedUri = likeValue?.subject?.uri;
+      if (!likedUri) return null;
+      
+      const post = postsMap.get(likedUri);
+      
+      return {
+        uri: record.uri,
+        cid: record.cid,
+        type: 'like' as const,
+        likedUri,
+        likedPost: post,
+        createdAt: new Date(likeValue.createdAt || record.uri),
+      };
+    })
+    .filter((like): like is LikeItem => like !== null);
   
   return {
     likes,
-    cursor: response.data.cursor,
+    cursor: likesResponse.data.cursor,
   };
 }
 
