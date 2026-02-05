@@ -6,6 +6,7 @@ import { FilterBar } from './FilterBar';
 import { DeleteConfirmModal } from './DeleteConfirmModal';
 import { filterContent } from '../hooks/useContent';
 import * as bluesky from '../services/bluesky';
+import logo from '/favicon.svg';
 
 interface DashboardProps {
   handle: string;
@@ -346,7 +347,7 @@ export function Dashboard({
         <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-              🦋 Bluesky Cleaner
+              <img src={logo} alt="" width="24" height="24" className="inline-block mr-1 align-text-bottom" aria-hidden="true" />Bluesky Cleaner
             </h1>
             <p className="text-sm text-gray-500 dark:text-gray-400">@{handle}</p>
           </div>

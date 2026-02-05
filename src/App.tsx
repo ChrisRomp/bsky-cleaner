@@ -3,6 +3,7 @@ import { useAuth } from './hooks/useAuth';
 import { useContent } from './hooks/useContent';
 import { LoginForm } from './components/LoginForm';
 import { Dashboard } from './components/Dashboard';
+import logo from '/favicon.svg';
 import { ErrorLog, type LogEntry } from './components/ErrorLog';
 
 let logIdCounter = 0;
@@ -92,7 +93,7 @@ function App() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
         <div className="text-center">
-          <div className="text-4xl mb-4">🦋</div>
+          <div className="text-4xl mb-4"><img src={logo} alt="Bluesky Cleaner" width="48" height="48" className="inline-block" /></div>
           <p className="text-gray-600 dark:text-gray-400">Loading...</p>
         </div>
       </div>
