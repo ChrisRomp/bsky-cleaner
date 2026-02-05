@@ -25,7 +25,7 @@ A web-based tool to help you clean up your old Bluesky posts, likes, reposts, an
 
 ### Online
 
-Visit [TODO: add deployed URL] to use the tool directly.
+Visit [chrisromp.github.io/bsky-cleaner](https://chrisromp.github.io/bsky-cleaner/) to use the tool directly.
 
 ### Local Development
 
