@@ -248,7 +248,7 @@ export async function fetchLikes(
         cid: record.cid,
         type: 'like' as const,
         likedUri,
-        likedPost: post,
+        likedPost: post ?? null,
         createdAt: new Date(likeValue.createdAt || record.uri),
       };
     })
