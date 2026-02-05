@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import logo from '/favicon.svg';
 
 interface LoginFormProps {
   onLogin: (handle: string, appPassword: string) => Promise<void>;
@@ -31,7 +32,7 @@ export function LoginForm({ onLogin, isLoading, error, sessionExpired, onClearSe
         )}
         <div className="text-center">
           <img 
-            src="/favicon.svg" 
+            src={logo} 
             alt="Bluesky Cleaner logo" 
             className="w-24 h-24 mx-auto mb-4"
           />
