@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import type { ContentItem, FilterState, ContentType, DryRunSummary, PostItem, FollowItem } from '../types';
 import { ContentCard } from './ContentCard';
 import { FollowCard } from './FollowCard';
@@ -76,6 +76,35 @@ export function Dashboard({
     total: number;
     failed: number;
   } | null>(null);
+  const [autoLoadCount, setAutoLoadCount] = useState(0);
+  const filterTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [debouncedFilters, setDebouncedFilters] = useState<FilterState>(filters);
+  const prevTabRef = useRef(activeTab);
+
+  // Debounce filter changes (especially for keyword typing)
+  useEffect(() => {
+    if (filterTimeoutRef.current) {
+      clearTimeout(filterTimeoutRef.current);
+    }
+    filterTimeoutRef.current = setTimeout(() => {
+      setDebouncedFilters(filters);
+      setAutoLoadCount(0); // Reset counter on filter change
+    }, 500);
+    return () => {
+      if (filterTimeoutRef.current) {
+        clearTimeout(filterTimeoutRef.current);
+      }
+    };
+  }, [filters]);
+  
+  // Reset auto-load counter when tab changes
+  useEffect(() => {
+    if (prevTabRef.current !== activeTab) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setAutoLoadCount(0);
+      prevTabRef.current = activeTab;
+    }
+  }, [activeTab]);
 
   const filteredPosts = useMemo(() => filterContent(posts, filters), [posts, filters]);
   const filteredLikes = useMemo(() => filterContent(likes, filters), [likes, filters]);
@@ -108,6 +137,37 @@ export function Dashboard({
   const isLoading = activeTab === 'posts' ? postsLoading : activeTab === 'likes' ? likesLoading : activeTab === 'reposts' ? repostsLoading : followsLoading;
   const cursor = activeTab === 'posts' ? postsCursor : activeTab === 'likes' ? likesCursor : activeTab === 'reposts' ? repostsCursor : followsCursor;
   const loadMore = activeTab === 'posts' ? onLoadMorePosts : activeTab === 'likes' ? onLoadMoreLikes : activeTab === 'reposts' ? onLoadMoreReposts : onLoadMoreFollows;
+
+  // Check if filters are active
+  const hasActiveFilters = debouncedFilters.dateFrom || debouncedFilters.dateTo || (debouncedFilters.keyword && debouncedFilters.keyword.length >= 3);
+  
+  const MIN_RESULTS = 10;
+  const MAX_AUTO_LOADS = 10;
+  
+  // Derive if we're auto-loading (filters active, few results, more to fetch, under limit)
+  const isAutoLoading = hasActiveFilters && 
+    currentItems.length < MIN_RESULTS && 
+    cursor && 
+    autoLoadCount < MAX_AUTO_LOADS;
+  
+  // Auto-load more content when filters result in few matches
+  useEffect(() => {
+    if (!hasActiveFilters) {
+      return;
+    }
+    
+    // Don't auto-load if already loading, no cursor, or hit limit
+    if (isLoading || !cursor || autoLoadCount >= MAX_AUTO_LOADS) {
+      return;
+    }
+    
+    // Auto-load if we have few filtered results
+    if (currentItems.length < MIN_RESULTS) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setAutoLoadCount(c => c + 1);
+      loadMore();
+    }
+  }, [hasActiveFilters, currentItems.length, isLoading, cursor, loadMore, autoLoadCount]);
 
   const handleToggleSelect = useCallback((uri: string) => {
     setSelectedUris(prev => {
@@ -397,13 +457,15 @@ export function Dashboard({
 
           {isLoading && (
             <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-              Loading...
+              {isAutoLoading ? 'Searching for matching content...' : 'Loading...'}
             </div>
           )}
 
           {!isLoading && currentItems.length === 0 && (
             <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-              No items found
+              {hasActiveFilters && !cursor 
+                ? 'No matching items found' 
+                : 'No items found'}
             </div>
           )}
 
