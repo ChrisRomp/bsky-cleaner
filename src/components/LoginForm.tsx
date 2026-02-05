@@ -106,6 +106,16 @@ export function LoginForm({ onLogin, isLoading, error, sessionExpired, onClearSe
             <p>🔒 Your app password is never stored.</p>
             <p>Session expires after ~2 hours or when you close the tab.</p>
             <p>All operations happen directly in your browser.</p>
+            <p className="pt-2">
+              <a
+                href="https://github.com/ChrisRomp/bsky-cleaner"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-500 hover:underline"
+              >
+                View source on GitHub
+              </a>
+            </p>
           </div>
         </form>
       </div>
