@@ -77,7 +77,7 @@ export function Dashboard({
     failed: number;
   } | null>(null);
   const [autoLoadCount, setAutoLoadCount] = useState(0);
-  const filterTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const filterTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [debouncedFilters, setDebouncedFilters] = useState<FilterState>(filters);
   const prevTabRef = useRef(activeTab);
 

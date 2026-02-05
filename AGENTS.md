@@ -37,9 +37,12 @@ These caused bugs during development:
 - Use `import type` for type-only imports (Vite's verbatimModuleSyntax)
 - Prefix unused callback args with `_` (e.g., `_event`)
 - Run `npm run check` (tsc + eslint) before committing
+- **Always run `npm run check` and `npm test` before pushing to `main`** — CI runs lint, type-check, test, and build on every push
 
 ## Testing
 
-No test framework currently. Manual testing with Playwright browser tools:
+- Unit tests use Vitest: `npm test`
+- CI workflow: `.github/workflows/ci.yml` (test + deploy to GitHub Pages)
+- Manual testing with Playwright browser tools
 - Test credentials can be stored in `.env` (not committed)
 - Use `user_handle` and `app_password` env vars
