@@ -69,7 +69,7 @@ npm run build
 
 ## Credits
 
-Built with [GitHub Copilot CLI](https://githubnext.com/projects/copilot-cli/).
+Built with [GitHub Copilot CLI](https://github.com/features/copilot/cli).
 
 ## License
 
