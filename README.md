@@ -67,6 +67,10 @@ npm run build
 - [ ] Export data before deletion
 - [ ] Scheduled cleanup rules
 
+## Contributing
+
+Found a bug or have a feature request? Please [open an issue](https://github.com/ChrisRomp/bsky-cleaner/issues).
+
 ## Credits
 
 Built with [GitHub Copilot CLI](https://github.com/features/copilot/cli).
