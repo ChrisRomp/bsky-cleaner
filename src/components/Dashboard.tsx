@@ -480,7 +480,7 @@ export function Dashboard({
 
           {/* Bottom selection bar - fixed above activity log */}
           {selectedUris.size > 0 && currentItems.length > 5 && (
-            <div className={`fixed left-0 right-0 bg-blue-50 dark:bg-blue-900/30 border-t border-blue-200 dark:border-blue-800 p-3 flex items-center justify-between z-40 shadow-lg ${hasLogEntries ? 'bottom-12' : 'bottom-0'}`}>
+            <div className="fixed left-0 right-0 bottom-0 bg-blue-50 dark:bg-blue-900/30 border-t border-blue-200 dark:border-blue-800 p-3 flex items-center justify-between z-[60] shadow-lg">
               <span className="text-sm text-blue-700 dark:text-blue-300 ml-4">
                 {selectedUris.size} item{selectedUris.size !== 1 ? 's' : ''} selected
               </span>
