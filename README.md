@@ -67,6 +67,10 @@ npm run build
 - [ ] Export data before deletion
 - [ ] Scheduled cleanup rules
 
+## Credits
+
+Built with [GitHub Copilot CLI](https://githubnext.com/projects/copilot-cli/).
+
 ## License
 
 [AGPL-3.0](LICENSE) - This software is free to use and modify, but any modifications must be shared under the same license. If you run a modified version as a network service, you must make the source code available to users.
