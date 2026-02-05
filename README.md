@@ -29,8 +29,8 @@ A web-based tool to help you clean up your old Bluesky posts, likes, reposts, an
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/bksy-cleaner.git
-cd bksy-cleaner
+git clone https://github.com/ChrisRomp/bsky-cleaner.git
+cd bsky-cleaner
 
 # Install dependencies
 npm install
