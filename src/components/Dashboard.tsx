@@ -59,7 +59,7 @@ export function Dashboard({
   onLogout,
   onDeleteError,
   onDeleteSuccess,
-  hasLogEntries,
+  hasLogEntries: _hasLogEntries,
 }: DashboardProps) {
   const [activeTab, setActiveTab] = useState<ContentType>('posts');
   const [filters, setFilters] = useState<FilterState>({
