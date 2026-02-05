@@ -4,6 +4,8 @@
 
 A web-based tool to help you clean up your old Bluesky posts, likes, reposts, and follows.
 
+**👉 [Use it now](https://chrisromp.github.io/bsky-cleaner/)**
+
 ## Features
 
 - **100% Client-Side** - Your credentials never leave your browser
@@ -22,10 +24,6 @@ A web-based tool to help you clean up your old Bluesky posts, likes, reposts, an
 - All API calls go directly from your browser to Bluesky
 
 ## Getting Started
-
-### Online
-
-Visit [chrisromp.github.io/bsky-cleaner](https://chrisromp.github.io/bsky-cleaner/) to use the tool directly.
 
 ### Local Development
 
