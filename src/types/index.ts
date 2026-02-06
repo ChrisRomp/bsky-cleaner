@@ -31,6 +31,7 @@ export interface PostItem {
   isReply: boolean;
   replyTo?: ReplyRef;
   quote?: QuoteRef;
+  embed?: AppBskyFeedDefs.PostView['embed'];
 }
 
 export interface LikeItem {

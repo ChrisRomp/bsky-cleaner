@@ -1,4 +1,37 @@
 import type { ContentItem, PostItem, LikeItem, RepostItem } from '../types';
+import type { AppBskyFeedDefs } from '@atproto/api';
+
+// Typed embed shapes for display purposes
+interface ImageEmbed {
+  $type: string;
+  images: Array<{ thumb: string; alt: string }>;
+}
+
+interface VideoEmbed {
+  $type: string;
+  thumbnail?: string;
+  alt?: string;
+}
+
+interface ExternalEmbed {
+  $type: string;
+  external: { uri: string; title: string; description: string; thumb?: string };
+}
+
+interface RecordWithMediaEmbed {
+  $type: string;
+  media?: ImageEmbed | VideoEmbed | ExternalEmbed;
+}
+
+interface RecordEmbed {
+  $type: string;
+  record?: {
+    $type?: string;
+    author?: { handle?: string };
+    value?: { text?: string };
+    embeds?: Array<{ $type?: string } & Record<string, unknown>>;
+  };
+}
 
 interface ContentCardProps {
   item: ContentItem;
@@ -93,6 +126,88 @@ export function ContentCard({ item, isSelected, onToggle }: ContentCardProps) {
   );
 }
 
+// Render a preview for posts with embeds but no/empty text
+function EmbedPreview({ embed }: { embed?: AppBskyFeedDefs.PostView['embed'] }) {
+  if (!embed) return <span className="italic text-gray-400">[Content unavailable]</span>;
+
+  const type = (embed as { $type?: string }).$type;
+
+  if (type === 'app.bsky.embed.images#view') {
+    const images = (embed as ImageEmbed).images;
+    return (
+      <span className="inline-flex items-center gap-1.5 flex-wrap">
+        {images.slice(0, 4).map((img, i) => (
+          <img key={i} src={img.thumb} alt={img.alt || 'Image'} className="w-32 h-32 rounded object-cover" />
+        ))}
+      </span>
+    );
+  }
+
+  if (type === 'app.bsky.embed.video#view') {
+    const video = embed as VideoEmbed;
+    return (
+      <span className="inline-flex items-center gap-1.5">
+        {video.thumbnail && (
+          <img src={video.thumbnail} alt={video.alt || 'Video'} className="w-32 h-32 rounded object-cover" />
+        )}
+        <span className="text-gray-400 text-xs">🎥 Video</span>
+      </span>
+    );
+  }
+
+  if (type === 'app.bsky.embed.external#view') {
+    const ext = (embed as ExternalEmbed).external;
+    return (
+      <span className="inline-flex items-center gap-1.5">
+        {ext.thumb && (
+          <img src={ext.thumb} alt="" className="w-32 h-32 rounded object-cover" />
+        )}
+        <span className="text-gray-400 text-xs">🔗 {ext.title || 'Link'}</span>
+      </span>
+    );
+  }
+
+  if (type === 'app.bsky.embed.record#view') {
+    const rec = (embed as RecordEmbed).record;
+    const author = rec?.author?.handle;
+    const text = (rec?.value as { text?: string })?.text;
+    return (
+      <div className="mt-1 p-2 bg-gray-100 dark:bg-gray-700 rounded-md border border-gray-200 dark:border-gray-600 text-xs">
+        <p className="text-gray-500 dark:text-gray-400 mb-0.5">📎 Quoting @{author || 'unknown'}</p>
+        {text && <p className="text-gray-600 dark:text-gray-300 line-clamp-2">{text}</p>}
+      </div>
+    );
+  }
+
+  if (type === 'app.bsky.embed.recordWithMedia#view') {
+    const media = (embed as RecordWithMediaEmbed).media;
+    return (
+      <span className="inline-flex items-center gap-1.5">
+        <EmbedPreview embed={media as AppBskyFeedDefs.PostView['embed']} />
+        <span className="text-gray-400 text-xs">+ 📎 Quote</span>
+      </span>
+    );
+  }
+
+  return <span className="italic text-gray-400">[Content unavailable]</span>;
+}
+
+// Get display content for a post: text and/or embed preview
+function PostDisplayContent({ post }: { post: AppBskyFeedDefs.PostView | null }) {
+  if (!post) return <span className="italic text-gray-400">[Content unavailable]</span>;
+
+  const record = post.record as { text?: string } | undefined;
+  const text = record?.text;
+
+  return (
+    <>
+      {text && <span className="whitespace-pre-wrap break-words line-clamp-3">{text}</span>}
+      {post.embed && <div className={text ? 'mt-1' : ''}><EmbedPreview embed={post.embed} /></div>}
+      {!text && !post.embed && <span className="italic text-gray-400">[Content unavailable]</span>}
+    </>
+  );
+}
+
 function PostContent({ item }: { item: PostItem }) {
   const truncate = (text: string, maxLen: number) => {
     if (text.length <= maxLen) return text;
@@ -123,9 +238,25 @@ function PostContent({ item }: { item: PostItem }) {
       )}
 
       {/* Post text */}
-      <p className="text-gray-900 dark:text-gray-100 whitespace-pre-wrap break-words">
-        {item.text}
-      </p>
+      {item.text && (
+        <p className="text-gray-900 dark:text-gray-100 whitespace-pre-wrap break-words">
+          {item.text}
+        </p>
+      )}
+
+      {/* Embed preview */}
+      {item.embed && (
+        <div className={`text-gray-900 dark:text-gray-100 ${item.text ? 'mt-1' : ''}`}>
+          <EmbedPreview embed={item.embed} />
+        </div>
+      )}
+
+      {/* Fallback for no text and no embed */}
+      {!item.text && !item.embed && (
+        <div className="text-gray-900 dark:text-gray-100">
+          <span className="italic text-gray-400">[Content unavailable]</span>
+        </div>
+      )}
 
       {/* Quote post */}
       {item.quote && (
@@ -162,8 +293,6 @@ function PostContent({ item }: { item: PostItem }) {
 }
 
 function LikeContent({ item }: { item: LikeItem }) {
-  const record = item.likedPost?.record as { text?: string } | undefined;
-  const text = record?.text || '[Content unavailable]';
   const author = item.likedPost?.author;
   const postUrl = item.likedPost ? getBskyUrl(item.likedPost.uri, author?.handle) : null;
 
@@ -177,9 +306,9 @@ function LikeContent({ item }: { item: LikeItem }) {
           `@${author?.handle || 'unknown'}`
         )}
       </p>
-      <p className="text-sm whitespace-pre-wrap break-words line-clamp-3">
-        {text}
-      </p>
+      <div className="text-sm">
+        <PostDisplayContent post={item.likedPost} />
+      </div>
       {postUrl && (
         <div className="mt-2">
           <ExternalLink href={postUrl} className="text-xs">
@@ -192,8 +321,6 @@ function LikeContent({ item }: { item: LikeItem }) {
 }
 
 function RepostContent({ item }: { item: RepostItem }) {
-  const record = item.repostedPost?.record as { text?: string } | undefined;
-  const text = record?.text || '[Content unavailable]';
   const author = item.repostedPost?.author;
   const postUrl = item.repostedPost ? getBskyUrl(item.repostedPost.uri, author?.handle) : null;
 
@@ -207,9 +334,9 @@ function RepostContent({ item }: { item: RepostItem }) {
           `@${author?.handle || 'unknown'}`
         )}
       </p>
-      <p className="text-sm whitespace-pre-wrap break-words line-clamp-3">
-        {text}
-      </p>
+      <div className="text-sm">
+        <PostDisplayContent post={item.repostedPost} />
+      </div>
       {postUrl && (
         <div className="mt-2">
           <ExternalLink href={postUrl} className="text-xs">

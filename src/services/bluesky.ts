@@ -190,6 +190,7 @@ export async function fetchPosts(
         isReply,
         replyTo,
         quote,
+        embed: post.embed,
       };
     });
   
