@@ -16,6 +16,7 @@ Context for AI coding assistants working on this codebase.
 | `src/hooks/useAuth.ts` | Authentication state and session management |
 | `src/hooks/useContent.ts` | Content fetching, filtering, pagination |
 | `src/components/Dashboard.tsx` | Main UI with tabs, selection, deletion logic |
+| `src/components/ContentCard.tsx` | Content rendering with embed previews for posts, likes, reposts |
 | `src/components/ErrorLog.tsx` | Activity log for errors/warnings |
 
 ## AT Protocol Gotchas
@@ -31,6 +32,8 @@ These caused bugs during development:
 4. **Deleted parent posts** - When fetching posts, `reply.parent.record` can be undefined if the parent was deleted. Always null-check.
 
 5. **Token lifetimes** - accessJwt ~2 hours, refreshJwt ~2 months. The `persistSession` callback fires on refresh.
+
+6. **`PostView.record.text` can be empty for media posts** - Image-only, video-only, and link-only posts have `text: ""`. Always check `post.embed` for content when text is empty. Embed thumbnails are CDN URLs available without extra API calls.
 
 ## Code Conventions
 
