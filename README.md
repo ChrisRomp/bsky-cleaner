@@ -59,19 +59,13 @@ npm run build
 - [Tailwind CSS](https://tailwindcss.com/) for styling
 - [@atproto/api](https://www.npmjs.com/package/@atproto/api) for Bluesky integration
 
-## Future Features
-
-- [ ] AI-powered content categorization (political, snarky, etc.)
-- [ ] Export data before deletion
-- [ ] Scheduled cleanup rules
-
 ## Contributing
 
 Found a bug or have a feature request? Please [open an issue](https://github.com/ChrisRomp/bsky-cleaner/issues).
 
 ## Credits
 
-Built with [GitHub Copilot CLI](https://github.com/features/copilot/cli).
+Built with [GitHub Copilot CLI](https://github.com/features/copilot/cli) and [GitHub Copilot Coding Agent](https://github.com/features/copilot/agents).
 
 ## License
 
