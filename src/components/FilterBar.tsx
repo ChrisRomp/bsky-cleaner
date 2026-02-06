@@ -46,8 +46,8 @@ export function FilterBar({ filters, onFilterChange }: FilterBarProps) {
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-4">
-      <div className="flex flex-wrap gap-4 items-end">
-        <div className="flex-1 min-w-[200px]">
+      <div className="flex flex-col sm:flex-row sm:flex-wrap gap-4 sm:items-end">
+        <div className="w-full sm:flex-1 sm:min-w-[200px]">
           <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
             From Date
           </label>
@@ -59,7 +59,7 @@ export function FilterBar({ filters, onFilterChange }: FilterBarProps) {
           />
         </div>
 
-        <div className="flex-1 min-w-[200px]">
+        <div className="w-full sm:flex-1 sm:min-w-[200px]">
           <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
             To Date
           </label>
@@ -71,7 +71,7 @@ export function FilterBar({ filters, onFilterChange }: FilterBarProps) {
           />
         </div>
 
-        <div className="flex-[2] min-w-[250px]">
+        <div className="w-full sm:flex-[2] sm:min-w-[250px]">
           <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
             Keyword Search
           </label>
