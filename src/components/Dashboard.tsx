@@ -101,7 +101,6 @@ export function Dashboard({
   // Reset auto-load counter when tab changes
   useEffect(() => {
     if (prevTabRef.current !== activeTab) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setAutoLoadCount(0);
       prevTabRef.current = activeTab;
     }
