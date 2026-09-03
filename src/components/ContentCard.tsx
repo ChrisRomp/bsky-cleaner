@@ -158,11 +158,11 @@ function EmbedPreview({ embed }: { embed?: AppBskyFeedDefs.PostView['embed'] }) 
   if (type === 'app.bsky.embed.external#view') {
     const ext = (embed as ExternalEmbed).external;
     return (
-      <span className="inline-flex items-center gap-1.5">
+      <span className="inline-flex flex-col items-start gap-1.5">
+        <span className="text-gray-400 text-xs">🔗 {ext.title || 'Link'}</span>
         {ext.thumb && (
           <img src={ext.thumb} alt="" className="w-32 h-32 rounded object-cover" />
         )}
-        <span className="text-gray-400 text-xs">🔗 {ext.title || 'Link'}</span>
       </span>
     );
   }
@@ -208,6 +208,15 @@ function PostDisplayContent({ post }: { post: AppBskyFeedDefs.PostView | null })
   );
 }
 
+function getQuotedEmbeds(embed?: AppBskyFeedDefs.PostView['embed']): AppBskyFeedDefs.PostView['embed'][] {
+  if ((embed as { $type?: string } | undefined)?.$type !== 'app.bsky.embed.record#view') {
+    return [];
+  }
+
+  const record = (embed as RecordEmbed).record;
+  return (record?.embeds || []) as AppBskyFeedDefs.PostView['embed'][];
+}
+
 function PostContent({ item }: { item: PostItem }) {
   const truncate = (text: string, maxLen: number) => {
     if (text.length <= maxLen) return text;
@@ -215,6 +224,7 @@ function PostContent({ item }: { item: PostItem }) {
   };
 
   const postUrl = getBskyUrl(item.uri);
+  const quotedEmbeds = getQuotedEmbeds(item.embed);
 
   return (
     <div>
@@ -245,14 +255,14 @@ function PostContent({ item }: { item: PostItem }) {
       )}
 
       {/* Embed preview */}
-      {item.embed && (
+      {item.embed && !item.quote && (
         <div className={`text-gray-900 dark:text-gray-100 ${item.text ? 'mt-1' : ''}`}>
           <EmbedPreview embed={item.embed} />
         </div>
       )}
 
       {/* Fallback for no text and no embed */}
-      {!item.text && !item.embed && (
+      {!item.text && !item.embed && !item.quote && (
         <div className="text-gray-900 dark:text-gray-100">
           <span className="italic text-gray-400">[Content unavailable]</span>
         </div>
@@ -271,9 +281,16 @@ function PostContent({ item }: { item: PostItem }) {
               `@${item.quote.quotedAuthor}`
             )}
           </p>
-          <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
-            {truncate(item.quote.quotedText, 150)}
-          </p>
+          {item.quote.quotedText && (
+            <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
+              {truncate(item.quote.quotedText, 150)}
+            </p>
+          )}
+          {quotedEmbeds.map((embed, index) => (
+            <div key={index} className={item.quote?.quotedText ? 'mt-1' : ''}>
+              <EmbedPreview embed={embed} />
+            </div>
+          ))}
         </div>
       )}
 
